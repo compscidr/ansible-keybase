@@ -15,7 +15,7 @@ collections:
 
 Use the role(s) in a playbook:
 ```
-- name: Install 1password
+- name: Install keybase
   hosts: all
   roles:
     - keybase
