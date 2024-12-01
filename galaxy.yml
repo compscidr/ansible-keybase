@@ -1,0 +1,13 @@
+---
+namespace: compscidr
+name: keybase
+authors:
+    - Jason Ernst <ernstjason1@gmail.com>
+description: Installs keybase
+license_file: LICENSE
+readme: README.md
+version: 0.0.1
+repository: https://github.com/compscidr/ansible-keybase
+tags:
+    - keybase
+    - application
