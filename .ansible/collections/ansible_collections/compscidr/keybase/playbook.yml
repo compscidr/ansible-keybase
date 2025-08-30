@@ -1,5 +1,0 @@
----
-- name: Install keybase
-  hosts: all
-  roles:
-    - keybase
