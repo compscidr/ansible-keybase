@@ -19,10 +19,6 @@ jobs:
   molecule:
     name: Molecule Test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        distro:
-          - ubuntu2004
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python
