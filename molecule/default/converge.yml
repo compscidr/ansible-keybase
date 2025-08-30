@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include keybase role
+      ansible.builtin.include_role:
+        name: keybase

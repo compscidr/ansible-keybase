@@ -1,0 +1,8 @@
+---
+# This file lists the dependencies for molecule testing
+# In CI, install these with: ansible-galaxy collection install -r molecule/requirements.yml
+collections:
+  - name: community.docker
+    version: ">=3.0.2"
+  - name: ansible.posix
+    version: ">=1.4.0"
