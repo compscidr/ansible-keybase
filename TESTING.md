@@ -1,50 +1,49 @@
-# Molecule Testing
+# Testing
 
-This project uses [Molecule](https://molecule.readthedocs.io/) for testing Ansible roles.
+This project uses Ansible's built-in syntax checking and linting for testing.
 
 ## Prerequisites
 
-1. Install molecule and dependencies:
+Install ansible-core and ansible-lint:
 ```bash
-pip install molecule[docker] molecule-docker ansible-lint
+pip install ansible-core ansible-lint
 ```
-
-2. Install required Ansible collections:
-```bash
-ansible-galaxy collection install -r molecule/requirements.yml
-```
-
-3. Ensure Docker is running on your system
 
 ## Running Tests
 
 ### Run all tests
 ```bash
-molecule test
+# Lint the Ansible code
+ansible-lint
+
+# Check playbook syntax
+ansible-playbook --syntax-check playbook.yml
 ```
 
-### Run individual steps
+### Continuous Integration
+
+The CI pipeline runs:
+1. **Ansible Lint** - Checks code quality and best practices
+2. **Syntax Check** - Validates playbook syntax
+
+## Test Coverage
+
+The tests verify that:
+1. All Ansible code follows best practices (via ansible-lint)
+2. Playbook syntax is valid (via syntax check)
+3. Role structure is correct
+
+## Local Development
+
+To run the same checks that CI runs:
+
 ```bash
-# Check syntax only
-molecule syntax
+# Install dependencies
+pip install ansible-core ansible-lint
 
-# Create test environment
-molecule create
+# Run linting
+ansible-lint
 
-# Run the role
-molecule converge
-
-# Verify installation
-molecule verify
-
-# Clean up
-molecule destroy
+# Check syntax
+ansible-playbook --syntax-check playbook.yml
 ```
-
-## Test Scenarios
-
-- **default**: Tests keybase installation on Ubuntu 20.04 Docker container
-
-The test verifies that:
-1. The keybase role runs successfully
-2. The keybase command is available after installation

@@ -22,8 +22,8 @@ Use the role(s) in a playbook:
 ```
 
 ## Testing
-This collection includes molecule tests to ensure the roles work correctly. See [TESTING.md](TESTING.md) for details on running tests locally.
+This collection includes automated testing to ensure the roles work correctly. See [TESTING.md](TESTING.md) for details on running tests locally.
 
 The CI pipeline automatically runs:
 - `ansible-lint` - Code quality and best practices
-- `molecule test` - Role functionality testing in Docker containers
+- `ansible-playbook --syntax-check` - Playbook syntax validation
