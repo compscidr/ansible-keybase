@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Include keybase role
+      ansible.builtin.include_role:
+        name: keybase
