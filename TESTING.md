@@ -4,10 +4,17 @@ This project uses [Molecule](https://molecule.readthedocs.io/) for testing Ansib
 
 ## Prerequisites
 
-Install molecule and dependencies:
+Create a virtual environment and install molecule and dependencies:
 ```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install molecule ansible-core ansible-lint
 ```
+
+**Note:** Remember to activate the virtual environment (`source venv/bin/activate`) before running tests in new terminal sessions.
 
 ## Running Tests
 
@@ -58,6 +65,10 @@ The CI pipeline automatically runs:
 To run the same checks that CI runs:
 
 ```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 # Install dependencies
 pip install molecule ansible-core ansible-lint
 
@@ -67,3 +78,5 @@ ansible-lint
 # Run molecule tests
 molecule test
 ```
+
+**Note:** Remember to activate the virtual environment (`source venv/bin/activate`) before running tests in new terminal sessions.
