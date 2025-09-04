@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify role structure exists
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: role_structure
+      with_items:
+        - "roles/keybase/tasks/main.yml"
+        - "roles/keybase/meta/main.yml"
+        - "roles/keybase/vars/main.yml"
+      delegate_to: localhost
+
+    - name: Verify all role files exist
+      ansible.builtin.assert:
+        that:
+          - role_structure.results | length > 0
+          - role_structure.results | selectattr('stat.exists', 'equalto', false) | list | length == 0
+        fail_msg: "Missing role files"
+        success_msg: "All role files are present"
+
+    - name: Verify role syntax by checking role metadata
+      ansible.builtin.include_vars:
+        file: roles/keybase/meta/main.yml
+      delegate_to: localhost

@@ -20,3 +20,10 @@ Use the role(s) in a playbook:
   roles:
     - keybase
 ```
+
+## Testing
+This collection includes molecule testing to ensure the roles work correctly. See [TESTING.md](TESTING.md) for details on running tests locally.
+
+The CI pipeline automatically runs:
+- `ansible-lint` - Code quality and best practices validation
+- `molecule test` - Role structure and syntax validation
