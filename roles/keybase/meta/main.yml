@@ -12,6 +12,7 @@ galaxy_info:
         - focal  # 20.04 LTS
         - jammy  # 22.04 LTS
         - noble  # 24.04 LTS
+        - resolute  # 26.04 LTS
   galaxy_tags:
     - keybase
     - application

@@ -1,23 +1,55 @@
 ---
-# https://book.keybase.io/docs/server/our-code-signing-key
-- name: Install keybase apt keys
+- name: Check keybase supports this architecture
+  tags: keybase
+  ansible.builtin.assert:
+    that: ansible_facts['architecture'] == 'x86_64'
+    fail_msg: >-
+      keybase's apt repo only publishes amd64 packages; this host is
+      {{ ansible_facts['architecture'] }}.
+
+# apt-key is gone as of Ubuntu 26.04 (apt 3), so ansible.builtin.apt_key no longer
+# works. The keybase package ships its own /usr/share/keyrings/keybase.asc and
+# /etc/apt/sources.list.d/keybase.list (plain files, overwritten on every install
+# or upgrade), so bootstrap exactly those paths and that line. Anything else ends
+# up with the repo configured twice once the package is installed.
+- name: Remove legacy keybase keyring
   tags: keybase
   become: true
-  ansible.builtin.apt_key:
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    # written by the previous apt_key task
+    - /usr/share/keyrings/keybase-archive-keyring.gpg
+    - /usr/share/keyrings/keybase-archive-keyring.gpg~
+
+- name: Check for keybase apt key
+  tags: keybase
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/keybase.asc
+  register: keybase_apt_key
+
+# https://book.keybase.io/docs/server/our-code-signing-key
+# Bootstrap only: once installed, the package owns this file and refreshes it on
+# upgrade. Its copy encodes the same key differently from the website's, and
+# get_url's If-Modified-Since check would otherwise swap them back and forth.
+- name: Install keybase apt key
+  tags: keybase
+  become: true
+  ansible.builtin.get_url:
     url: https://keybase.io/docs/server_security/code_signing_key.asc
-    id: 222B85B0F90BE2D24CFEB93F47484E50656D16C7
-    state: present
-    keyring: /usr/share/keyrings/keybase-archive-keyring.gpg
+    dest: /usr/share/keyrings/keybase.asc
+    mode: '0644'
+  when: not keybase_apt_key.stat.exists
 
 - name: Install keybase repo
   tags: keybase
   become: true
-  ansible.builtin.apt_repository:
-    repo: >
-      deb [arch={{ [ansible_architecture] | map('extract', keybase_deb_architecture) | first }} signed-by=/usr/share/keyrings/keybase-archive-keyring.gpg]
-      http://prerelease.keybase.io/deb stable main
-    state: present
-    filename: keybase
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/keybase.list
+    content: |
+      deb [signed-by=/usr/share/keyrings/keybase.asc] http://prerelease.keybase.io/deb stable main
+    mode: '0644'
 
 - name: Install keybase
   tags: keybase
