@@ -33,14 +33,65 @@
 # Bootstrap only: once installed, the package owns this file and refreshes it on
 # upgrade. Its copy encodes the same key differently from the website's, and
 # get_url's If-Modified-Since check would otherwise swap them back and forth.
-- name: Install keybase apt key
+#
+# The repo is plain http, so this key is the whole trust anchor: download it to a
+# temp file and only install it once its primary key(s) are exactly the pinned
+# fingerprint. A bad download must never reach the real path, since the stat
+# gate above would then skip it on every later run.
+- name: Bootstrap keybase apt key
   tags: keybase
   become: true
-  ansible.builtin.get_url:
-    url: https://keybase.io/docs/server_security/code_signing_key.asc
-    dest: /usr/share/keyrings/keybase.asc
-    mode: '0644'
   when: not keybase_apt_key.stat.exists
+  block:
+    - name: Install gpg (needed to verify the keybase key)
+      ansible.builtin.apt:
+        name: gpg
+        state: present
+        update_cache: true
+
+    - name: Create temp file for keybase key
+      ansible.builtin.tempfile:
+        suffix: .asc
+      register: keybase_key_tmp
+
+    - name: Download keybase key
+      ansible.builtin.get_url:
+        url: https://keybase.io/docs/server_security/code_signing_key.asc
+        dest: "{{ keybase_key_tmp.path }}"
+        mode: '0644'
+        force: true
+
+    - name: Read keybase key primary fingerprints
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          gpg --show-keys --with-colons {{ keybase_key_tmp.path }}
+          | awk -F: '/^pub/ {p=1; next} p && /^fpr/ {print $10; p=0}'
+        executable: /bin/bash
+      register: keybase_key_fingerprints
+      changed_when: false
+
+    - name: Verify keybase key fingerprint
+      ansible.builtin.assert:
+        that: keybase_key_fingerprints.stdout_lines == [keybase_signing_key_fingerprint]
+        fail_msg: >-
+          Downloaded keybase key has primary fingerprint(s)
+          {{ keybase_key_fingerprints.stdout_lines }}, expected only
+          {{ keybase_signing_key_fingerprint }}. Not installing it.
+        quiet: true
+
+    - name: Install keybase apt key
+      ansible.builtin.copy:
+        src: "{{ keybase_key_tmp.path }}"
+        dest: /usr/share/keyrings/keybase.asc
+        remote_src: true
+        mode: '0644'
+  always:
+    - name: Remove temp keybase key
+      ansible.builtin.file:
+        path: "{{ keybase_key_tmp.path }}"
+        state: absent
+      when: keybase_key_tmp.path is defined
 
 - name: Install keybase repo
   tags: keybase
