@@ -6,7 +6,7 @@ authors:
 description: Installs keybase
 license_file: LICENSE
 readme: README.md
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/compscidr/ansible-keybase
 tags:
     - keybase

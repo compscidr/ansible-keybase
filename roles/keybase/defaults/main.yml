@@ -1,0 +1,5 @@
+---
+# Primary key fingerprint of the keybase code signing key, checked before the
+# downloaded key is trusted (the apt repo itself is plain http).
+# https://book.keybase.io/docs/server/our-code-signing-key
+keybase_signing_key_fingerprint: 222B85B0F90BE2D24CFEB93F47484E50656D16C7
